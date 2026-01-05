@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Work Week Widget</title>
+
+  <style>
+    :root { color-scheme: light dark; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #191919;   /* Notion dark */
+      color: #ffffff;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Roboto, Helvetica, Arial;
+    }
+
+    @media (prefers-color-scheme: light) {
+      html, body {
+        background: #ffffff;
+        color: #000000;
+      }
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    .widget {
+      width: 320px;
+      padding: 16px 20px;
+      background: transparent;
+    }
+
+    .range {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="widget">
+    <div class="range" id="range">—</div>
+  </div>
+
+  <script>
+    function startOfWeekMonday(d) {
+      const date = new Date(d);
+      date.setHours(0,0,0,0);
+      const day = date.getDay();
+      const diff = (day === 0 ? -6 : 1 - day);
+      date.setDate(date.getDate() + diff);
+      return date;
+    }
+
+    function endOfWeekSunday(start) {
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      return end;
+    }
+
+    function formatRange(start, end) {
+      if (
+        start.getMonth() === end.getMonth() &&
+        start.getFullYear() === end.getFullYear()
+      ) {
+        return `${start.toLocaleString(undefined, { month: "long" })} ${start.getDate()}–${end.getDate()}`;
+      }
+
+      return `${start.toLocaleString(undefined, { month: "short" })} ${start.getDate()} – ${end.toLocaleString(undefined, { month: "short" })} ${end.getDate()}`;
+    }
+
+    function update() {
+      const now = new Date();
+      const start = startOfWeekMonday(now);
+      const end = endOfWeekSunday(start);
+      document.getElementById("range").textContent = formatRange(start, end);
+    }
+
+    update();
+    setInterval(update, 60 * 60 * 1000);
+  </script>
+</body>
+</html>
