@@ -1,77 +1,102 @@
-<style>
-  :root { color-scheme: light dark; }
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notion Date Time Widget</title>
 
-  /* This is the KEY change:
-     Make the iframe page match Notion instead of transparent */
-  html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    background: #191919; /* Notion dark */
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-                 "Segoe UI", Roboto, Helvetica, Arial;
-  }
+  <style>
+    :root { color-scheme: light dark; }
 
-  @media (prefers-color-scheme: light) {
+    /* Make the iframe page blend with Notion */
     html, body {
-      background: #ffffff; /* Notion light */
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #191919;   /* Notion dark-ish */
+      color: #ffffff;        /* <-- ensures text is visible */
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Roboto, Helvetica, Arial;
     }
-  }
 
-  body {
-    display: grid;
-    place-items: center;
-  }
+    /* If the viewer/browser is in light mode */
+    @media (prefers-color-scheme: light) {
+      html, body {
+        background: #ffffff;
+        color: #000000;
+      }
+    }
 
-  .widget {
-    width: 240px;
-    height: 240px;
-    border-radius: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
+    body {
+      display: grid;
+      place-items: center;
+    }
 
-    background: transparent;
-
-    border: 1.5px solid rgba(255,255,255,0.35);
-    box-shadow: none;
-
-    text-align: center;
-  }
-
-  @media (prefers-color-scheme: light) {
     .widget {
-      border-color: rgba(0,0,0,0.25);
+      width: 240px;
+      height: 240px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+
+      background: transparent;
+
+      /* Outline-only */
+      border: 1.5px solid rgba(255,255,255,0.35);
+      text-align: center;
     }
-  }
 
-  .date {
-    font-size: 34px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    color: #ffffff;
-  }
+    @media (prefers-color-scheme: light) {
+      .widget {
+        border-color: rgba(0,0,0,0.25);
+      }
+    }
 
-  @media (prefers-color-scheme: light) {
     .date {
-      color: #000000;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
-  }
 
-  .time {
-    font-size: 20px;
-    font-weight: 600;
-    opacity: 0.75;
-    letter-spacing: -0.01em;
-    color: #ffffff;
-  }
-
-  @media (prefers-color-scheme: light) {
     .time {
-      color: #000000;
+      font-size: 20px;
+      font-weight: 600;
+      opacity: 0.75; /* inherits the page text color */
+      letter-spacing: -0.01em;
     }
-  }
-</style>
+  </style>
+</head>
+
+<body>
+  <div class="widget">
+    <div class="date" id="date">---</div>
+    <div class="time" id="time">--:--</div>
+  </div>
+
+  <script>
+    function update() {
+      const now = new Date();
+
+      document.getElementById("date").textContent =
+        new Intl.DateTimeFormat(undefined, {
+          weekday: "long",
+          month: "short",
+          day: "numeric"
+        }).format(now);
+
+      document.getElementById("time").textContent =
+        new Intl.DateTimeFormat(undefined, {
+          hour: "numeric",
+          minute: "2-digit"
+        }).format(now);
+    }
+
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+</html>
