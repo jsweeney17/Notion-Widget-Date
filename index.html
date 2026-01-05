@@ -8,18 +8,16 @@
   <style>
     :root { color-scheme: light dark; }
 
-    /* Make the iframe page blend with Notion */
     html, body {
       margin: 0;
       width: 100%;
       height: 100%;
       background: #191919;   /* Notion dark-ish */
-      color: #ffffff;        /* <-- ensures text is visible */
+      color: #ffffff;
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
                    "Segoe UI", Roboto, Helvetica, Arial;
     }
 
-    /* If the viewer/browser is in light mode */
     @media (prefers-color-scheme: light) {
       html, body {
         background: #ffffff;
@@ -32,6 +30,7 @@
       place-items: center;
     }
 
+    /* --- Animated outline widget --- */
     .widget {
       width: 240px;
       height: 240px;
@@ -41,18 +40,64 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
+      text-align: center;
 
       background: transparent;
 
-      /* Outline-only */
-      border: 1.5px solid rgba(255,255,255,0.35);
-      text-align: center;
+      /* We draw the border with a pseudo-element */
+      position: relative;
+      isolation: isolate; /* keeps the pseudo-element tidy */
+    }
+
+    /* The animated outline layer */
+    .widget::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px; /* outline thickness */
+
+      /* subtle animated gradient */
+      background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.18),
+        rgba(255,255,255,0.38),
+        rgba(255,255,255,0.18)
+      );
+      background-size: 200% 200%;
+      animation: borderShift 8s ease-in-out infinite;
+
+      /* This makes only the “stroke” show, not a filled box */
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+
+      pointer-events: none;
+      z-index: -1;
     }
 
     @media (prefers-color-scheme: light) {
-      .widget {
-        border-color: rgba(0,0,0,0.25);
+      .widget::before {
+        background: linear-gradient(
+          120deg,
+          rgba(0,0,0,0.10),
+          rgba(0,0,0,0.28),
+          rgba(0,0,0,0.10)
+        );
       }
+    }
+
+    @keyframes borderShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .widget::before { animation: none; }
     }
 
     .date {
@@ -65,7 +110,7 @@
     .time {
       font-size: 20px;
       font-weight: 600;
-      opacity: 0.75; /* inherits the page text color */
+      opacity: 0.75;
       letter-spacing: -0.01em;
     }
   </style>
